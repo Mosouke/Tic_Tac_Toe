@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Tic Tac Toe</title>
+    <title>Tic Tac To</title>
 </head>
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/index.html">TicTacTo PvP</a></li>
+                <li><a href="/index_vs_ia.html">TicTacTo PvIA</a></li>
+                <li><a href="/index_vs_ia_hardmode.html">TicTacTo PvIA HardMode</a></li>
+            </ul>
+        </nav>
+    </header>
     <div class="container">
-        <h1>Tic Tac Toe (PvP)</h1>
+        <h1>Tic Tac To (PvIA)</h1>
         <div id="status" class="status">It's X's turn</div>
         <div class="scoreboard">
             <div>Player X: <span id="scoreX">0</span></div>
@@ -34,6 +43,6 @@
         </table>
         <button id="reset">Reset Game</button>
     </div>
-    <script src="script/index.js"></script>
+    <script src="script/index_vs_ia.js"></script>
 </body>
 </html>
