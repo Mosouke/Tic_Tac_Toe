@@ -4,45 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Tic Tac To</title>
+    <title>Tic Tac Toe</title>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/index.html">TicTacTo PvP</a></li>
-                <li><a href="/index_vs_ia.html">TicTacTo PvIA</a></li>
-                <li><a href="/index_vs_ia_hardmode.html">TicTacTo PvIA HardMode</a></li>
-            </ul>
-        </nav>
-    </header>
-    <div class="container">
-        <h1>Tic Tac To (PvIA)</h1>
-        <div id="status" class="status">It's X's turn</div>
-        <div class="scoreboard">
-            <div>Player X: <span id="scoreX">0</span></div>
-            <div>Player O: <span id="scoreO">0</span></div>
-            <div>Draws: <span id="scoreDraw">0</span></div>
+    <main>
+        <div class="container">
+            <h1>Tic Tac Toe (PvIA HardMode)</h1>
+            <div id="status" class="status">It's X's turn</div>
+            <div class="scoreboard">
+                <div>Player X: <span id="scoreX">0</span></div>
+                <div>Player O: <span id="scoreO">0</span></div>
+                <div>Draws: <span id="scoreDraw">0</span></div>
+            </div>
+            <table class="tg">
+                <tr>
+                    <td class="tg-0lax" data-index="0"></td>
+                    <td class="tg-0lax" data-index="1"></td>
+                    <td class="tg-0lax" data-index="2"></td>
+                </tr>
+                <tr>
+                    <td class="tg-0lax" data-index="3"></td>
+                    <td class="tg-0lax" data-index="4"></td>
+                    <td class="tg-0lax" data-index="5"></td>
+                </tr>
+                <tr>
+                    <td class="tg-0lax" data-index="6"></td>
+                    <td class="tg-0lax" data-index="7"></td>
+                    <td class="tg-0lax" data-index="8"></td>
+                </tr>
+            </table>
+            <button id="reset">Reset Game</button>
         </div>
-        <table class="tg">
-            <tr>
-                <td class="tg-0lax" data-index="0"></td>
-                <td class="tg-0lax" data-index="1"></td>
-                <td class="tg-0lax" data-index="2"></td>
-            </tr>
-            <tr>
-                <td class="tg-0lax" data-index="3"></td>
-                <td class="tg-0lax" data-index="4"></td>
-                <td class="tg-0lax" data-index="5"></td>
-            </tr>
-            <tr>
-                <td class="tg-0lax" data-index="6"></td>
-                <td class="tg-0lax" data-index="7"></td>
-                <td class="tg-0lax" data-index="8"></td>
-            </tr>
-        </table>
-        <button id="reset">Reset Game</button>
-    </div>
+    </main>
+    
     <script src="script/index.js"></script>
 </body>
 </html>

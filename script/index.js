@@ -1,122 +1,188 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const cells = document.querySelectorAll('.tg-0lax');
     const status_div = document.getElementById('status');
     const score_x_span = document.getElementById('scoreX');
     const score_o_span = document.getElementById('scoreO');
-    const score_draw_span = document.getElementById('scoreDraw'); 
+    const score_draw_span = document.getElementById('scoreDraw');
     const reset_button = document.getElementById('reset');
 
-    let current_player = 'X';
+    let human_player = 'X';
+    let ai_player = 'O';
+
+    let current_player = human_player;
     let game_state = ['', '', '', '', '', '', '', '', ''];
     let score_x = 0;
-    let score_o = 0; 
+    let score_o = 0;
     let score_draw = 0;
 
     const win_conditions = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
+        [0, 1, 2],  // lignes
+        [3, 4, 5],  // lignes
+        [6, 7, 8],  // lignes
+        [0, 3, 6],  // colonnes
+        [1, 4, 7],  // colonnes
+        [2, 5, 8],  // colonnes
+        [0, 4, 8],  // diagonales
+        [2, 4, 6]   // diagonales
     ];
 
-    function handle_cell_click(e) {
-        const cell = e.target;
-        const cell_index = parseInt(cell.getAttribute('data-index')); 
-
-        if (game_state[cell_index] !== '' || check_winner()) {
-            return;
-        }
-
-        game_state[cell_index] = current_player;
-        cell.innerHTML = current_player;
-
-        if (check_winner()) {
-            status_div.innerHTML = `${current_player} wins!`;
-            if (current_player === 'X') {
-                score_x++;
-                score_x_span.innerText = score_x;
-            } else {
-                score_o++;
-                score_o_span.innerText = score_o;
-            }
-            reset_game();
-        } else if (!game_state.includes('')) {
-            status_div.innerHTML = "Draw!";
-            score_draw++;
-            score_draw_span.innerText = score_draw;
-            reset_game();
-        } else {
-            current_player = current_player === 'X' ? 'O' : 'X';
-            status_div.innerHTML = `It's ${current_player}'s turn`;
-
-            if (current_player === 'O') {
-                handle_ai_turn();
-            }
-        }
-    }
-    // la fonction pour changé le joueur O par l'ia
-    function handle_ai_turn() {
-        let available_indices = [];
-        game_state.forEach((cell, index) => {
-            if (cell === '') {
-                available_indices.push(index);
-            }
+    // Fonction principale pour démarrer le jeu
+    function startGame() {
+        cells.forEach(cell => {
+            cell.innerHTML = '';
+            cell.addEventListener('click', handleHumanTurn);
         });
-
-        if (available_indices.length === 0 || check_winner()) {
-            return;
-        }
-
-        const random_index = available_indices[Math.floor(Math.random() * available_indices.length)];
-        game_state[random_index] = current_player;
-        cells[random_index].innerHTML = current_player;
-
-        if (check_winner()) {
-            status_div.innerHTML = `${current_player} wins!`;
-            if (current_player === 'X') {
-                score_x++;
-                score_x_span.innerText = score_x;
-            } else {
-                score_o++;
-                score_o_span.innerText = score_o;
-            }
-            reset_game();
-        } else if (!game_state.includes('')) {
-            status_div.innerHTML = "Draw!";
-            score_draw++;
-            score_draw_span.innerText = score_draw;
-            reset_game();
-        } else {
-            current_player = 'X';
-            status_div.innerHTML = `It's ${current_player}'s turn`;
-        }
-    }
-
-    function check_winner() {
-        let round_won = false;
-        for (let i = 0; i < win_conditions.length; i++) {
-            const [a, b, c] = win_conditions[i];
-            if (game_state[a] && game_state[a] === game_state[b] && game_state[a] === game_state[c]) {
-                round_won = true;
-                break;
-            }
-        }
-        return round_won;
-    }
-
-    function reset_game() {
-        game_state = ['', '', '', '', '', '', '', '', ''];
-        cells.forEach(cell => cell.innerHTML = '');
-        current_player = 'X';
         status_div.innerHTML = `It's ${current_player}'s turn`;
     }
 
-    cells.forEach(cell => cell.addEventListener('click', handle_cell_click));
-    reset_button.addEventListener('click', reset_game);
-    status_div.innerHTML = `It's ${current_player}'s turn`;
+    // fonction pour les tour du joueur humain
+    function handleHumanTurn(e) {
+        if (current_player !== human_player) return;
+
+        const cell = e.target;
+        const cell_index = parseInt(cell.getAttribute('data-index'));
+
+        if (game_state[cell_index] !== '') return;
+
+        makeMove(cell_index, human_player);
+
+        if (checkWinner(game_state, human_player)) {
+            handleEndGame(human_player);
+        } else if (!game_state.includes('')) {
+            handleEndGame('draw');
+        } else {
+            current_player = ai_player;
+            status_div.innerHTML = `AI is thinking...`;
+            setTimeout(handleAITurn, 800); // Délai pour simuler un temps de réflexion pour l'IA eh eh
+        }
+    }
+
+    // Gestion du tour de l'IA avec l'algorithme Minimax
+    function handleAITurn() {
+        const bestMove = getBestMove();
+        makeMove(bestMove.index, ai_player);
+
+        if (checkWinner(game_state, ai_player)) {
+            handleEndGame(ai_player);
+        } else if (!game_state.includes('')) {
+            handleEndGame('draw');
+        } else {
+            current_player = human_player;
+            status_div.innerHTML = `It's ${current_player}'s turn`;
+        }
+    }
+
+    // Effectuer un mouvement
+    function makeMove(index, player) {
+        game_state[index] = player;
+        cells[index].innerHTML = player;
+    }
+
+    // la fin du jeu
+    function handleEndGame(winner) {
+        if (winner === human_player) {
+            score_x++;
+            score_x_span.innerText = score_x;
+            status_div.innerHTML = `${winner} wins!`;
+        } else if (winner === ai_player) {
+            score_o++;
+            score_o_span.innerText = score_o;
+            status_div.innerHTML = `AI wins!`;
+        } else {
+            score_draw++;
+            score_draw_span.innerText = score_draw;
+            status_div.innerHTML = `It's a draw!`;
+        }
+
+        cells.forEach(cell => {
+            cell.removeEventListener('click', handleHumanTurn);
+        });
+
+        setTimeout(resetGame, 1500); // un petit délai avant que je jeux ce réinisialise
+    }
+
+    // Réinitialiser le jeu
+    function resetGame() {
+        game_state = ['', '', '', '', '', '', '', '', ''];
+        cells.forEach(cell => {
+            cell.innerHTML = '';
+            cell.addEventListener('click', handleHumanTurn);
+        });
+        current_player = human_player;
+        status_div.innerHTML = `It's ${current_player}'s turn`;
+    }
+
+    // Vérifier s'il y a un gagnant
+    function checkWinner(board, player) {
+        for (let condition of win_conditions) {
+            const [a, b, c] = condition;
+            if (board[a] === player && board[b] === player && board[c] === player) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Obtenir le meilleur coup pour l'IA avec l'algorithme Minimax
+    function getBestMove() {
+        let bestScore = -Infinity;
+        let bestMove;
+
+        for (let i = 0; i < game_state.length; i++) {
+            if (game_state[i] === '') {
+                game_state[i] = ai_player;
+                let score = minimax(game_state, 0, false);
+                game_state[i] = '';
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = { index: i, score };
+                }
+            }
+        }
+
+        return bestMove;
+    }
+
+    // Fonction minimax avec élagage alpha-bêta 
+    function minimax(board, depth, isMaximizingPlayer, alpha = -Infinity, beta = Infinity) {
+        if (checkWinner(board, human_player)) {
+            return -10 + depth;
+        } else if (checkWinner(board, ai_player)) {
+            return 10 - depth;
+        } else if (!board.includes('')) {
+            return 0;
+        }
+
+        if (isMaximizingPlayer) {
+            let maxEval = -Infinity;
+            for (let i = 0; i < board.length; i++) {
+                if (board[i] === '') {
+                    board[i] = ai_player;
+                    let eval = minimax(board, depth + 1, false, alpha, beta);
+                    board[i] = '';
+                    maxEval = Math.max(maxEval, eval);
+                    alpha = Math.max(alpha, eval);
+                    if (beta <= alpha) break;
+                }
+            }
+            return maxEval;
+        } else {
+            let minEval = Infinity;
+            for (let i = 0; i < board.length; i++) {
+                if (board[i] === '') {
+                    board[i] = human_player;
+                    let eval = minimax(board, depth + 1, true, alpha, beta);
+                    board[i] = '';
+                    minEval = Math.min(minEval, eval);
+                    beta = Math.min(beta, eval);
+                    if (beta <= alpha) break;
+                }
+            }
+            return minEval;
+        }
+    }
+
+    // Démarrer le jeu au chargement de la page
+    startGame();
 });
